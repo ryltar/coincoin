@@ -1,4 +1,33 @@
-class CoinCoinMiner : public Miner{
+#include <iostream>
+#include <stdio.h>
+#include <string.h>
+#include <openssl/sha.h>
+#include <chrono>
+#include <cstdlib>
+#include <ctime>
+#include <random>
+#include <map>
+
+using namespace std;
+
+class CoinMiner{
+    public:
+        CoinMiner() = default;
+        virtual bool parserCommandLine(char* argv[], int size) = 0;
+        virtual char getRandomChar() = 0;
+        virtual string generateNounce() = 0;
+        virtual string sha1(unsigned char *data, size_t length) = 0;
+        virtual long int unix_timestamp() = 0;
+        virtual string baseToken(const string triOwn) = 0;
+        virtual inline int check(string pieces, string token, int number) = 0;
+        virtual inline bool checkArguments(int number) = 0;
+        virtual void benchmark() = 0;
+        virtual void mining(string tri, int min) = 0;
+        virtual map<string, string> parameters(char* argv[]) = 0;
+        virtual void chooseOptions(char* argv[]) = 0;
+};
+
+class CoinCoinMiner : public CoinMiner{
     protected:
         int poolSize;
         char ascii[97];
@@ -68,7 +97,7 @@ class CoinCoinMiner : public Miner{
                 }
             }
             if(numberOfC >= number){
-                cout << numberOfC << " c trouvĂ©" << endl;
+                cout << numberOfC << " c trouvé" << endl;
                 cout << pieces << endl;
                 cout << token << endl;
             }
@@ -148,4 +177,18 @@ class CoinCoinMiner : public Miner{
                 mining(params["tri"], stoi(params["min"]));
             }
         }
+
 };
+
+int main(int argc, char** argv) {
+    srand(time(0));
+    auto *miner = new CoinCoinMiner();
+    bool commandLineTrue = miner->checkArguments(argc);
+    if (!commandLineTrue) {
+        return 1;
+    }else{
+        miner->chooseOptions(argv);
+    }
+
+    return 0;
+}
